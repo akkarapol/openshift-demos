@@ -120,7 +120,7 @@ objects:
     name: ${APPLICATION_NAME}-postgresql
   spec:
     accessModes:
-      - ReadWriteOnce
+      - ReadWriteMany
     resources:
       requests:
         storage: ${POSTGRESQL_VOLUME_CAPACITY}
@@ -227,7 +227,8 @@ objects:
               name: ${APPLICATION_NAME}-data
         dnsPolicy: ClusterFirst
         restartPolicy: Always
-        securityContext: {}
+        securityContext: 
+          runAsUser: 1000100001
         terminationGracePeriodSeconds: 30
         volumes:
         - name: ${APPLICATION_NAME}-data
