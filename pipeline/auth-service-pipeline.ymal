@@ -6,8 +6,7 @@ spec:
   strategy:
     jenkinsPipelineStrategy:
       jenkinsfile: |-
-        pipeline {
-        
+        pipeline {        
 	  // Use Jenkins Maven slave
 	  // Jenkins will dynamically provision this as OpenShift Pod
 	  // All the stages and steps of this Pipeline will be executed on this Pod
