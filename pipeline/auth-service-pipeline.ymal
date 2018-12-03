@@ -6,8 +6,7 @@ spec:
   strategy:
     jenkinsPipelineStrategy:
       jenkinsfile: |-
-        pipeline {
-        
+        pipeline {        
 		  // Use Jenkins Maven slave
 		  // Jenkins will dynamically provision this as OpenShift Pod
 		  // All the stages and steps of this Pipeline will be executed on this Pod
@@ -19,14 +18,14 @@ spec:
 		  stages {
 			// Checkout source code
 			// This is required as Pipeline code is originally checkedout to
-			// Jenkins Master but this will also pull this same code to this slave
+				// Jenkins Master but this will also pull this same code to this slave
 			stage('Git Checkout') {
 			  steps {
 				// Turn off Git's SSL cert check, uncomment if needed
 				// sh 'git config --global http.sslVerify false'
 				git branch: 'master', url: 'http://gogs-cicd.192.168.99.100.nip.io/akkarawu/auth_service.git'
-			  }
-			}
+				  }
+			 }
 
 			// Run Maven build, skipping tests
 			stage('Build'){
@@ -58,5 +57,5 @@ spec:
 			  }
 			}
 		  }
-	  } // pipeline
+		} // pipeline
       type: JenkinsPipeline
