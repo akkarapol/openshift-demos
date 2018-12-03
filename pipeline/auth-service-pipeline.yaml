@@ -22,6 +22,20 @@ spec:
                 sh "mvn clean install -DskipTests=true -f pom.xml"
               }
             }
+            //sonar
+            stage('Code Analysis') {
+              steps {
+                script {
+                  sh "mvn sonar:sonar -Dsonar.host.url=http://sonarqube-cicd.192.168.99.100.nip.io -DskipTests=true"
+                }
+              }
+            }
+            //nexus3
+            stage('Archive App') {
+              steps {
+                sh "mvn deploy -DskipTests=true -P nexus3"
+              }
+            }
           }
         } // pipeline
       type: JenkinsPipeline
