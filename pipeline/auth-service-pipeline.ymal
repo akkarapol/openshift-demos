@@ -7,68 +7,56 @@ spec:
     jenkinsPipelineStrategy:
       jenkinsfile: |-
         pipeline {
-          stages {
-            stage 'Clone the project'
-            git 'http://gogs-cicd.192.168.99.100.nip.io/akkarawu/auth_service.git'
+		  // Use Jenkins Maven slave
+		  // Jenkins will dynamically provision this as OpenShift Pod
+		  // All the stages and steps of this Pipeline will be executed on this Pod
+		  // After Pipeline completes the Pod is killed so every run will have clean
+		  // workspace
+		  agent {
+			label 'maven'
+		  }
+		  stages {
+			// Checkout source code
+			// This is required as Pipeline code is originally checkedout to
+			// Jenkins Master but this will also pull this same code to this slave
+			stage('Git Checkout') {
+			  steps {
+				// Turn off Git's SSL cert check, uncomment if needed
+				// sh 'git config --global http.sslVerify false'
+				git branch: 'master', url: 'http://gogs-cicd.192.168.99.100.nip.io/akkarawu/auth_service.git'
+			  }
+			}
+		  
+			// Run Maven build, skipping tests
+			stage('Build'){
+			  steps {
+				  sh "mvn clean install -DskipTests=true -f pom.xml"
+			  }
+			}
 
-            dir('spring-jenkins-pipeline') {
-                stage("Compilation and Analysis") {
-                    parallel 'Compilation': {
-                        sh "./mvnw clean install -DskipTests"
-                    }, 'Static Analysis': {
-                        stage("Checkstyle") {
-                            sh "./mvnw checkstyle:checkstyle"
-
-                            step([$class: 'CheckStylePublisher',
-                              canRunOnFailed: true,
-                              defaultEncoding: '',
-                              healthy: '100',
-                              pattern: '**/target/checkstyle-result.xml',
-                              unHealthy: '90',
-                              useStableBuildAsReference: true
-                            ])
-                        }
-                    }
-                }
-
-                stage("Tests and Deployment") {
-                    parallel 'Unit tests': {
-                        stage("Runing unit tests") {
-                            try {
-                                sh "./mvnw test -Punit"
-                            } catch(err) {
-                                step([$class: 'JUnitResultArchiver', testResults:
-                                  '**/target/surefire-reports/TEST-*UnitTest.xml'])
-                                throw err
-                            }
-                           step([$class: 'JUnitResultArchiver', testResults:
-                             '**/target/surefire-reports/TEST-*UnitTest.xml'])
-                        }
-                    }, 'Integration tests': {
-                        stage("Runing integration tests") {
-                            try {
-                                sh "./mvnw test -Pintegration"
-                            } catch(err) {
-                                step([$class: 'JUnitResultArchiver', testResults:
-                                  '**/target/surefire-reports/TEST-'
-                                    + '*IntegrationTest.xml'])
-                                throw err
-                            }
-                            step([$class: 'JUnitResultArchiver', testResults:
-                              '**/target/surefire-reports/TEST-'
-                                + '*IntegrationTest.xml'])
-                        }
-                    }
-
-                    stage("Staging") {
-                        sh "pid=\$(lsof -i:8989 -t); kill -TERM \$pid "
-                          + "|| kill -KILL \$pid"
-                        withEnv(['JENKINS_NODE_COOKIE=dontkill']) {
-                            sh 'nohup ./mvnw spring-boot:run -Dserver.port=8989 &'
-                        }
-                    }
-                }
-            }
-          }
-        } // pipeline
+			// Run Maven unit tests
+			stage('Unit Test'){
+			  steps {
+				sh "mvn test -f pom.xml"
+			  }
+			}
+			
+			//sonar
+			stage('Code Analysis') {
+			  steps {
+				script {
+				  sh "mvn sonar:sonar -Dsonar.host.url=http://sonarqube-cicd.192.168.99.100.nip.io -DskipTests=true"
+				}
+			  }
+			}
+			
+			//nexus3
+			stage('Archive App') {
+			  steps {
+				sh "mvn deploy -DskipTests=true -P nexus3"
+			  }
+			}
+			
+		  }
+		} // pipeline
       type: JenkinsPipeline
