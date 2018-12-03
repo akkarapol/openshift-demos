@@ -6,7 +6,6 @@ spec:
   strategy:
     jenkinsPipelineStrategy:
       jenkinsfile: |-
-<<<<<<< HEAD
 	  
         pipeline { 
 		  // Use Jenkins Maven slave
