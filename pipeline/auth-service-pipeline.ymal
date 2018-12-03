@@ -6,8 +6,7 @@ spec:
   strategy:
     jenkinsPipelineStrategy:
       jenkinsfile: |-	  
-        pipeline { 		  
-          
+        pipeline {
 	  agent {
 	    label 'maven'
           }
