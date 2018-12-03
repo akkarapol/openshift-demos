@@ -21,7 +21,7 @@ spec:
               steps {
                 sh "mvn clean install -DskipTests=true -f pom.xml"
               }
-            }	
+            }
           }
         } // pipeline
       type: JenkinsPipeline
