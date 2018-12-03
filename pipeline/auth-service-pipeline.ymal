@@ -7,15 +7,15 @@ spec:
     jenkinsPipelineStrategy:
       jenkinsfile: |-	  
         pipeline { 		  
-		  agent {
-			label 'maven'
-		  }
-		  stages {
-			stage('Git Checkout') {
-			  steps {
-			    git branch: 'master', url: 'http://gogs-cicd.192.168.99.100.nip.io/akkarawu/auth_service.git'
-			  }
-			}			
-		  }
-		} // pipeline
+          agent {
+	    label 'maven'
+          }
+          stages {
+	    stage('Git Checkout') {
+	      steps {
+	        git branch: 'master', url: 'http://gogs-cicd.192.168.99.100.nip.io/akkarawu/auth_service.git'
+	      }
+	    }			
+          }
+        } // pipeline
       type: JenkinsPipeline
