@@ -15,7 +15,13 @@ spec:
               steps {
                 git branch: 'master', url: 'http://gogs-cicd.192.168.99.100.nip.io/akkarawu/auth_service.git'
               }
-            }			
+            }
+            // Run Maven build, skipping tests
+			stage('Build'){
+			  steps {
+				sh "mvn clean install -DskipTests=true -f pom.xml"
+			  }
+			}			
           }
         } // pipeline
       type: JenkinsPipeline
