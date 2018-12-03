@@ -9,7 +9,7 @@ spec:
         pipeline {
           agent {
             label 'maven'
-          }    
+          }
           stages {
             stage('Git Checkout') {
               steps {
@@ -17,11 +17,11 @@ spec:
               }
             }
             // Run Maven build, skipping tests
-			stage('Build'){
-			  steps {
-				sh "mvn clean install -DskipTests=true -f pom.xml"
-			  }
-			}			
+            stage('Build'){
+              steps {
+                sh "mvn clean install -DskipTests=true -f pom.xml"
+              }
+            }			
           }
         } // pipeline
       type: JenkinsPipeline
